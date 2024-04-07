@@ -1,5 +1,4 @@
 import gradio as gr
-import modules.shared as shared
 import re
 import requests
 import time
@@ -132,12 +131,6 @@ def search_pubmed(terms):
         time.sleep(1.0)
     return refs
 
-def setup():
-    """
-    Gets executed only once, when the extension is imported.
-    """
-    pass
-
 def ui():
     """
     Gets executed when the UI is drawn. Custom gradio elements and
@@ -195,10 +188,4 @@ def input_modifier(string, state, is_chat=False):
         state["context"] += "\n\nSome of the references below should be cited."
         add_context(articles, state)
     string = re.sub(search_re, r"\1", string)
-    return string
-
-def output_modifier(string, state, is_chat=False):
-    """
-    Modifies the LLM output before it is shown to the user.
-    """
     return string
