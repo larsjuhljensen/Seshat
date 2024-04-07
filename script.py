@@ -12,7 +12,10 @@ params = {
     "ncbi_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
     "search_arxiv": False,
     "search_pubmed": True,
-    "yake_limit": 0,
+    "tagger_active": False,
+    "tagger_url": "https://tagger.jensenlab.org/",
+    "yake_active": False,
+    "yake_limit": 10,
     "yake_score": 0.05
 }
 
@@ -140,11 +143,15 @@ def ui():
         with gr.Row():
             search_arxiv = gr.Checkbox(label="Search arXiv", value=params["search_arxiv"])
             search_pubmed = gr.Checkbox(label="Search PubMed", value=params["search_pubmed"])
+            tagger_active = gr.Checkbox(label="Automatic entity names", value=params["tagger_active"])
+            yake_active = gr.Checkbox(label="Automatic keywords", value=params["yake_active"])
         with gr.Row():
             yake_limit = gr.Slider(0, 20, step=1, label="Maximum number of keywords", value=params["yake_limit"])
             yake_score = gr.Slider(0.00, 0.20, step=0.01, label="Maximum keyword score", value=params["yake_score"])
     search_arxiv.change(lambda x: params.update({"search_arxiv": x}), search_arxiv, None)
     search_pubmed.change(lambda x: params.update({"search_pubmed": x}), search_pubmed, None)
+    tagger_active.change(lambda x: params.update({"tagger_active": x}), tagger_active, None)
+    yake_active.change(lambda x: params.update({"yake_active": x}), yake_active, None)
     yake_limit.change(lambda x: params.update({"yake_limit": x}), yake_limit, None)
     yake_score.change(lambda x: params.update({"yake_score": x}), yake_score, None)
 
@@ -167,12 +174,26 @@ def input_modifier(string, state, is_chat=False):
     articles = []
     search_re = r"\{(.+?)\}"
     search_terms = re.findall(search_re, string)
-    if (params["yake_limit"] > 0):
+    if params["tagger_active"]:
+        postdata = {
+            "document": string,
+            "entity_types": "9606 -1 -2 -22 -25 -26",
+            "format": "tsv"
+        }
+        tsvstring = requests.post(params["tagger_url"]+"/GetEntities", data=postdata).text
+        if len(tsvstring) > 0:
+            for entity in tsvstring.split("\n"):
+                (entity_name, entity_type, entity_id) = entity.split("\t")
+                if entity_name not in search_terms:
+                    search_terms.append(entity_name)
+    if params["yake_active"]:
         yake_keyword_extractor = yake.KeywordExtractor(lan="en", n=3, dedupLim=0.9, top=params["yake_limit"], features=None)
         yake_keywords = [keyword[0] for keyword in yake_keyword_extractor.extract_keywords(string) if keyword[1]<=params["yake_score"]]
         if not yake_keywords:
             logger.warn("Seshat found no keywords with Yake.")
-        search_terms += yake_keywords
+        for yake_keyword in yake_keywords:
+            if yake_keyword not in search_terms:
+                search_terms.append(yake_keyword)
     logger.info("Seshat search terms: "+", ".join(search_terms))
     if params["search_arxiv"]:
         arxiv_refs = search_arxiv(search_terms)
