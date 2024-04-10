@@ -210,3 +210,14 @@ def input_modifier(string, state, is_chat=False):
         add_context(articles, state)
     string = re.sub(search_re, r"\1", string)
     return string
+
+def output_modifier(string, state, is_chat=False):
+    """
+    Modifies the LLM output before it is sent to the user.
+    """
+    string = re.sub(r"In the realm of ", "Within ", string)
+    string = re.sub(r"delve into ", "explore ", string)
+    string = re.sub(r"intricate ", "complex ", string)
+    string = re.sub(r"meticulous ", "careful ", string)
+    string = re.sub(r"tapestry of ", "mixture of ", string)
+    return string
