@@ -10,6 +10,7 @@ from modules.logging_colors import logger
 params = {
     "arxiv_url": "http://export.arxiv.org/api/",
     "ncbi_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+    "replace_botwords": True,
     "search_arxiv": False,
     "search_pubmed": True,
     "tagger_active": False,
@@ -141,13 +142,15 @@ def ui():
     """
     with gr.Accordion("Seshat", open=True):
         with gr.Row():
+            replace_botwords = gr.Checkbox(label="Replace bot words", value=params["replace_botwords"])
             search_arxiv = gr.Checkbox(label="Search arXiv", value=params["search_arxiv"])
             search_pubmed = gr.Checkbox(label="Search PubMed", value=params["search_pubmed"])
             tagger_active = gr.Checkbox(label="Automatic entity names", value=params["tagger_active"])
-            yake_active = gr.Checkbox(label="Automatic keywords", value=params["yake_active"])
         with gr.Row():
-            yake_limit = gr.Slider(0, 20, step=1, label="Maximum number of keywords", value=params["yake_limit"])
-            yake_score = gr.Slider(0.00, 0.20, step=0.01, label="Maximum keyword score", value=params["yake_score"])
+            yake_active = gr.Checkbox(label="Automatic keywords", value=params["yake_active"])
+            yake_limit = gr.Slider(0, 20, step=1, label="Maximum keywords", value=params["yake_limit"])
+            yake_score = gr.Slider(0.00, 0.20, step=0.01, label="Maximum score", value=params["yake_score"])
+    replace_botwords.change(lambda x: params.update({"replace_botwords": x}), replace_botwords, None)
     search_arxiv.change(lambda x: params.update({"search_arxiv": x}), search_arxiv, None)
     search_pubmed.change(lambda x: params.update({"search_pubmed": x}), search_pubmed, None)
     tagger_active.change(lambda x: params.update({"tagger_active": x}), tagger_active, None)
@@ -215,9 +218,10 @@ def output_modifier(string, state, is_chat=False):
     """
     Modifies the LLM output before it is sent to the user.
     """
-    string = re.sub(r"In the realm of ", "Within ", string)
-    string = re.sub(r"delve into ", "explore ", string)
-    string = re.sub(r"intricate ", "complex ", string)
-    string = re.sub(r"meticulous ", "careful ", string)
-    string = re.sub(r"tapestry of ", "mixture of ", string)
+    if params["replace_botwords"]:
+        string = re.sub(r"In the realm of ", "Within ", string)
+        string = re.sub(r"delve into ", "explore ", string)
+        string = re.sub(r"intricate ", "complex ", string)
+        string = re.sub(r"meticulous ", "precise ", string)
+        string = re.sub(r"tapestry of ", "mixture of ", string)
     return string
