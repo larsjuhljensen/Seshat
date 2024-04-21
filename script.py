@@ -219,9 +219,12 @@ def output_modifier(string, state, is_chat=False):
     Modifies the LLM output before it is sent to the user.
     """
     if params["replace_botwords"]:
-        string = re.sub(r"In the realm of ", "Within ", string)
+        string = re.sub(r"burgeoning", "broad ", string)
         string = re.sub(r"delve into ", "explore ", string)
+        string = re.sub(r"dive into", "explore ", string)
         string = re.sub(r"intricate ", "complex ", string)
         string = re.sub(r"meticulous ", "precise ", string)
+        string = re.sub(r"meticulously ", "carefully ", string)
         string = re.sub(r"tapestry of ", "mixture of ", string)
+        string = re.sub(r"the realm of ", "", string)
     return string
