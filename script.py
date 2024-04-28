@@ -164,12 +164,12 @@ def input_modifier(string, state, is_chat=False):
     """
     articles = []
     arxiv_re = r"arxiv:? ?([0-9][0-9][0-9][0-9]\.[0-9]+)"
-    arxiv_refs = re.findall(arxiv_re, string, re.IGNORECASE)
+    arxiv_refs = re.findall(arxiv_re, string, flags = re.IGNORECASE)
     articles += retrieve_arxiv(arxiv_refs)
     doi_re = r"doi: ?(10\.[0-9]+/[a-z0-9._;()/-]+)"
-    doi_refs = re.findall(doi_re, string, re.IGNORECASE)
+    doi_refs = re.findall(doi_re, string, flags = re.IGNORECASE)
     pubmed_re = r"pmid:? ?0*([0-9]+)"
-    pubmed_refs = re.findall(pubmed_re, string, re.IGNORECASE)
+    pubmed_refs = re.findall(pubmed_re, string, flags = re.IGNORECASE)
     articles += retrieve_pubmed(pubmed_refs)
     if articles:
         state["context"] += "\n\nAll following references should be cited."
@@ -218,6 +218,8 @@ def output_modifier(string, state, is_chat=False):
     """
     Modifies the LLM output before it is sent to the user.
     """
+    string = re.sub(r"arXiv: ?", "arXiv:", string, flags = re.IGNORECASE)
+    string = re.sub(r"(PMID|PubMed ?ID): ?", "PMID:", string, flags = re.IGNORECASE)
     if params["replace_botwords"]:
         string = re.sub(r"burgeoning", "broad ", string)
         string = re.sub(r"delve into ", "explore ", string)
