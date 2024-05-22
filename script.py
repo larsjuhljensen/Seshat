@@ -221,6 +221,7 @@ def output_modifier(string, state, is_chat=False):
     string = re.sub(r"arXiv: ?", "arXiv:", string, flags = re.IGNORECASE)
     string = re.sub(r"(PMID|PubMed ?ID): ?", "PMID:", string, flags = re.IGNORECASE)
     if params["replace_botwords"]:
+        string = re.sub(r"amalgamation ", "combination ", string)
         string = re.sub(r"burgeoning", "broad ", string)
         string = re.sub(r"delve into ", "explore ", string)
         string = re.sub(r"dive into", "explore ", string)
