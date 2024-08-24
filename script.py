@@ -165,12 +165,18 @@ def input_modifier(string, state, is_chat=False):
     articles = []
     arxiv_re = r"arxiv:? ?([0-9][0-9][0-9][0-9]\.[0-9]+)"
     arxiv_refs = re.findall(arxiv_re, string, flags = re.IGNORECASE)
-    articles += retrieve_arxiv(arxiv_refs)
+    if arxiv_refs:
+        logger.info("Seshat arXiv references: "+", ".join(arxiv_refs))
+        articles += retrieve_arxiv(arxiv_refs)
     doi_re = r"doi: ?(10\.[0-9]+/[a-z0-9._;()/-]+)"
     doi_refs = re.findall(doi_re, string, flags = re.IGNORECASE)
+    if doi_refs:
+        logger.info("Seshat DOI references: "+", ".join(doi_refs))
     pubmed_re = r"pmid:? ?0*([0-9]+)"
     pubmed_refs = re.findall(pubmed_re, string, flags = re.IGNORECASE)
-    articles += retrieve_pubmed(pubmed_refs)
+    if pubmed_refs:
+        logger.info("Seshat PubMed references: "+", ".join(pubmed_refs))
+        articles += retrieve_pubmed(pubmed_refs)
     if articles:
         state["context"] += "\n\nAll following references should be cited."
         add_context(articles, state)
