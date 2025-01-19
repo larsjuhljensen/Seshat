@@ -4,6 +4,6 @@ This is an extension for [text-generation-webui](https://github.com/oobabooga/te
 
 To install this extension, clone the repository with the ``extensions`` folder of your text-generation-webui installation. This will create a new directory called Seshat. For the best results, I recommend that you move the files ``Seshat.png`` and ``Seshat.yaml`` from this directory into your ``characters`` directory and activate this character when using the extension. The character card contains important instructions to try to ensure that the LLM sticks to the provided references. These instructions could have been built into the extension itself, but are instead provided as a character card to allow for prompt engineering without having to edit Python code.
 
-The extension works well with a wide range of instruct models, including Meta Llama-3.1 8B and Mistral NeMo. My current preferred model is Qwen2.5 14B (or larger), which I find to be as good as any model at adhering to the instructions and writing as any model. Its context length of 32k is also sufficient to allow for many references.
+The extension works well with a wide range of instruct models, including Meta Llama-3.1 8B and Mistral NeMo. My current preferred model is the 14B Phi-4 model, which I find to be as good as any model at adhering to the instructions and writing as any model. Its context length of 16k is also sufficient to allow for many references. A solid alternative is Qwen2.5 14B (or larger), which has 32k context length.
 
 ![AI-generated image of Sethat](Seshat.png)
